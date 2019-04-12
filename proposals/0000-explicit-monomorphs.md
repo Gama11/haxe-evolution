@@ -9,7 +9,7 @@ Introduce a `_` syntax for explicit monomorphs in type hints.
 
 ## Motivation
 
-Haxe's type system has monomorphs, but no way to explicitly express this in syntax. Usually this is done simply by omitting the type hint:
+Haxe's type system has monomorphs, but no way to _explicitly_ express this in syntax. Usually this is done _implicitly_ by omitting the type hint:
 
 ```haxe
 var m; // Unknown<0>
