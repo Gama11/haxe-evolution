@@ -32,7 +32,7 @@ var m:ReadOnlyMap<String, (Int, Int) -> Int> = [
 ];
 ```
 
-Even worse, if not careful, information can be lost this way. Normally Haxe would infer the function type as `(a:Int, b:Int) -> Int`, including argument names. But if these are spelled out explicitly as well, the example becomes even more verbose.
+Even worse, if one is not careful, information can be lost this way. Normally Haxe would infer the function type as `(a:Int, b:Int) -> Int`, including argument names. But if these are spelled out explicitly as well, the example becomes even more verbose.
 
 Contrast this with the much more readable `_` syntax:
 
@@ -41,6 +41,7 @@ var m:ReadOnlyMap<_, _> = [
 	"add" => (a, b) -> a + b,
 	"subtract" => (a, b) -> a - b
 ];
+$type(m); // ReadOnlyMap<String, (a:Int, b:Int) -> Int>
 ```
 
 Syntax-wise, underscores are the natural choice, as they are already used as wildcards in pattern matching. Furthermore, it's also a well-established convention to use `_` for local identifiers that are "ignored", though it does not yet have special semantics here. So the proposed syntax is both familiar and concise.
@@ -78,7 +79,7 @@ None apart from the usual concerns with adding new syntax.
 
 ## Alternatives
 
-While Haxe does not have a syntax or built-in type for monomorphs, a `Mono<T>` type can already be implemented with a `@:genericBuild` macro that returns `null`:
+While Haxe does not have a syntax or built-in type for monomorphs, a `Mono` type can already be implemented with a `@:genericBuild` macro that returns `null`:
 
 ```haxe
 class Main {
@@ -99,7 +100,7 @@ class Macro {
 }
 ```
 
-Unfortunately, realistically speaking the most concise syntax possible with this approach that it still readable is `Mono` (`_` is not a valid type name, and a single-character name like `M` seems questionable). Since `Mono` looks like a regular type name, it does not reduce the visual noise when reading code by nearly as much as `_`.
+Unfortunately, realistically speaking the most concise syntax possible with this approach that is also _still readable_ is `Mono`. `_` is not a valid type name, and a single-character name like `M` seems questionable. Since `Mono` looks like a regular type name, it does not reduce the visual noise when reading code by nearly as much as `_` would.
 
 However, it does raise the question if allowing `_` as a type name could be a viable alternative to introducing `ComplexType.TMono`. The standard library would possibly contain a `@:coreType abstract _ {}` in this case. Still, this might end up being just as or even more breaking than introducing a new `ComplexType` constructor, as various tools will have to support types named `_`. It also means the toplevel `_` type could be shadowed by user types, which seems undesirable.
 
