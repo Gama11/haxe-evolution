@@ -21,18 +21,18 @@ However, this approach does not work for parameterized types:
 var m:Map; // Invalid number of type parameters for Map
 ```
 
-In accordance with the "Don't Repeat Yourself" principle, it is considered best practice to leverage type inference to _decrease_ redundant information and to _increase_ readability. However, this becomes impossible as soon as parameterized types are involved. We cannot let type parameters be inferred while also specifying the outer type.
+In accordance with the "Don't Repeat Yourself" principle, type inference should be leveraged to decrease redundant information and thus increase readability. However, this becomes impossible as soon as parameterized types are involved. We cannot let type parameters be inferred while also specifying the outer type.
 
-A good example where this is problematic is the use case of typing a map literal as a read-only abstract. To the reader it's obvious what the type parameters should be, yet they have to be written out explicitly:
+A good example where this is problematic is the use case of typing a map literal as a read-only abstract. To the reader it's likely obvious what the type parameters should be since the map is initialized with a literal right away, yet they have to be written out explicitly:
 
 ```haxe
 var m:ReadOnlyMap<String, (Int, Int) -> Int> = [
-	"add" => (a, b) -> a + b,
-	"subtract" => (a, b) -> a - b
+	"add" => (a:Int, b:Int) -> a + b,
+	"subtract" => (a:Int, b:Int) -> a - b
 ];
 ```
 
-Even worse, if one is not careful, information can be lost this way. Normally Haxe would infer the function type as `(a:Int, b:Int) -> Int`, including argument names. But if these are spelled out explicitly as well, the example becomes even more verbose.
+Even worse, if one is not careful, type information can be lost this way. Normally Haxe would infer the function type as `(a:Int, b:Int) -> Int`, including argument names. But if these are spelled out explicitly as well, the example becomes even more verbose.
 
 Contrast this with the much more readable `_` syntax:
 
@@ -44,9 +44,9 @@ var m:ReadOnlyMap<_, _> = [
 $type(m); // ReadOnlyMap<String, (a:Int, b:Int) -> Int>
 ```
 
-Syntax-wise, underscores are the natural choice, as they are already used as wildcards in pattern matching. Furthermore, it's also a well-established convention to use `_` for local identifiers that are "ignored", though it does not yet have special semantics here. So the proposed syntax is both familiar and concise.
+Syntax-wise, underscores are the natural choice, as they are already used as wildcards in pattern matching and `bind()`. Furthermore, it's also a well-established convention to use `_` for local identifiers that are "ignored", though it does not have special semantics here at the moment. So the proposed syntax is both familiar and concise.
 
-Another possibility might be `?`, but this seems problematic since this is already used for optional types. `_` currently has no meaning in type hints and does not parse.
+Another possible choice for syntax might be `?`. This could overload the syntax too much though, since this is already used for optional types. `_` currently has no meaning in type hints and does not parse.
 
 A natural extension of the syntax is to allow the last `_` type parameter to act as a _rest argument_, effectively a wildcard for however many type parameters follow. This too follows the precedent set by pattern matching:
 
@@ -114,17 +114,19 @@ If `_` is established as the de facto syntax for monomorphs, it should also be u
 
 ### Default type parameters
 
-Furthermore, though neither proposal depends on the other, explicit monomorphs would play well together with [default type parameters](https://github.com/HaxeFoundation/haxe-evolution/pull/50), as it would allow explicit usage of a default value:
+Furthermore, though neither proposal depends on the other, explicit monomorphs would play well together with [default type parameters](https://github.com/HaxeFoundation/haxe-evolution/pull/50), as it would to "skip" a type parameter with a default value so the default value does not have to be copied:
 
 ```haxe
 class T<A = String, B> {}
 var t:T<_, Int>;
 ```
 
-Not only does this make the code more readable because the intent is clearer, it also allows switching out the concrete default value of `A` at the declaration without needing to update the usage.
+Here, this would result in a Monomorph [constrained to](https://github.com/HaxeFoundation/haxe/pull/9549) `String` and better express the user's intent (he only cares about specifying the second type parameter).
 
 ## Unresolved questions
 
 It is unclear whether it makes sense to allow explicit monomorphs outside of type parameters. `var foo:_;` should possibly result in a typer error, but might be useful for macros.
 
 Similarly, it is unclear whether `_` should itself be allowed to be parameterized (`var foo:_<Int> = [];`).
+
+Using `_` in for monomorphs in error messages might not be practical if there are multiple monomorphs, which are currently numbered: `Unknown<0>`, `Unknown<1>`... Perhaps these could be printed as `_0`, `_1`...
