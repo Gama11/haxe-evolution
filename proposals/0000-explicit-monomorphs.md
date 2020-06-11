@@ -38,8 +38,8 @@ Contrast this with the much more readable `_` syntax:
 
 ```haxe
 var m:ReadOnlyMap<_, _> = [
-	"add" => (a, b) -> a + b,
-	"subtract" => (a, b) -> a - b
+	"add" => (a:Int, b:Int) -> a + b,
+	"subtract" => (a:Int, b:Int) -> a - b
 ];
 $type(m); // ReadOnlyMap<String, (a:Int, b:Int) -> Int>
 ```
