@@ -100,7 +100,7 @@ class Macro {
 }
 ```
 
-Unfortunately, realistically speaking the most concise syntax possible with this approach that is also _still readable_ is `Mono`. `_` is not a valid type name, and a single-character name like `M` seems questionable. Since `Mono` looks like a regular type name, it does not reduce the visual noise when reading code by nearly as much as `_` would.
+However, realistically speaking the most concise syntax that's possible with this approach that is also _still readable_ is `Mono`. `_` is not a valid type name, and a single-character name like `M` not very readable. Since `Mono` looks like a regular type name, it does not reduce the visual noise when reading code by nearly as much as `_` would.
 
 However, it does raise the question if allowing `_` as a type name could be a viable alternative to introducing `ComplexType.TMono`. The standard library would possibly contain a `@:coreType abstract _ {}` in this case. Still, this might end up being just as or even more breaking than introducing a new `ComplexType` constructor, as various tools will have to support types named `_`. It also means the toplevel `_` type could be shadowed by user types, which seems undesirable.
 
